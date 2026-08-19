@@ -13,6 +13,14 @@ private const val BASE = "http://ws.bus.go.kr/api/rest"
 
 class BusApiException(message: String) : Exception(message)
 
+/**
+ * 사용자가 설정 화면에서 넣은 공공데이터포털 인증키. 앱 진입 시 Prefs 에서 채운다.
+ * 비어 있으면 빌드에 포함된 키(BuildConfig)를 쓴다. 배포용 APK 는 빌드 키 없이 나가므로
+ * 받은 사람은 자기 키를 넣어 쓴다.
+ */
+@Volatile
+var userApiKey: String = ""
+
 // ---------- 공개 API ----------
 
 suspend fun searchStops(query: String): List<BusStop> =
@@ -83,8 +91,8 @@ private suspend fun call(path: String, vararg params: Pair<String, String>): Lis
 private fun enc(v: String) = URLEncoder.encode(v, "UTF-8")
 
 internal fun buildUrl(path: String, params: Map<String, String>): String {
-    val key = BuildConfig.BUS_API_KEY
-    if (key.isBlank()) throw BusApiException("인증키가 없습니다. local.properties 의 DATA_GO_KR_KEY 를 채우고 다시 빌드하세요.")
+    val key = userApiKey.ifBlank { BuildConfig.BUS_API_KEY }
+    if (key.isBlank()) throw BusApiException("인증키가 없습니다. 설정 화면에서 공공데이터포털 인증키를 넣어주세요.")
     // 포털의 Encoding 키를 그대로 붙여넣은 경우 이중 인코딩 방지
     val serviceKey = if (key.contains('%')) key else enc(key)
     val query = params.entries.joinToString("&") { "${it.key}=${enc(it.value)}" }

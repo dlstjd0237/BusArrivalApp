@@ -132,4 +132,18 @@ class BusApiTest {
         assertEquals("지선", routeTypeName("4"))
         assertEquals("", routeTypeName(null))
     }
+
+    @Test
+    fun `사용자 키는 URL 인코딩하고 이미 인코딩된 키는 그대로 둔다`() {
+        try {
+            userApiKey = "ab+cd/ef=="
+            val url = buildUrl("stationinfo/getStationByName", mapOf("stSrch" to "x"))
+            assertTrue(url, url.contains("serviceKey=ab%2Bcd%2Fef%3D%3D"))
+
+            userApiKey = "ab%2Bcd"   // 포털의 Encoding 키를 붙여넣은 경우 이중 인코딩 금지
+            assertTrue(buildUrl("x", emptyMap()).contains("serviceKey=ab%2Bcd"))
+        } finally {
+            userApiKey = ""
+        }
+    }
 }

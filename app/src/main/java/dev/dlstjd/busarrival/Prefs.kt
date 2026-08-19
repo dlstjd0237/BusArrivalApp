@@ -13,6 +13,15 @@ import org.json.JSONObject
 private val Context.dataStore by preferencesDataStore("bus")
 private val TARGETS = stringPreferencesKey("targets")
 private val CACHE = stringPreferencesKey("cache")
+private val API_KEY = stringPreferencesKey("apiKey")
+
+suspend fun loadApiKey(ctx: Context): String = ctx.dataStore.data.first()[API_KEY].orEmpty()
+
+/** 저장하고 바로 통신에 반영된다. */
+suspend fun saveApiKey(ctx: Context, key: String) {
+    userApiKey = key.trim()
+    ctx.dataStore.edit { it[API_KEY] = key.trim() }
+}
 
 suspend fun loadTargets(ctx: Context): List<TrackedRoute> = parseTargets(ctx.dataStore.data.first()[TARGETS])
 
@@ -92,6 +101,8 @@ suspend fun saveCache(ctx: Context, cache: Map<String, Arrival>) {
  * @return 갱신된 캐시와 첫 에러 메시지(전부 성공이면 null)
  */
 suspend fun refreshAndCache(ctx: Context): Pair<Map<String, Arrival>, String?> {
+    // 위젯 워커·탭에서도 들어오므로 여기서 키를 맞춰둔다.
+    if (userApiKey.isBlank()) userApiKey = loadApiKey(ctx)
     val targets = loadTargets(ctx)
     val cache = loadCache(ctx).toMutableMap()
     var error: String? = null

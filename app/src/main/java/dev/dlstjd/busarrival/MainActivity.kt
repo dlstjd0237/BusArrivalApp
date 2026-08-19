@@ -77,6 +77,7 @@ private fun App() {
     var editing by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        userApiKey = loadApiKey(ctx)
         val loaded = loadTargets(ctx)
         targets = loaded
         editing = loaded.isEmpty()
@@ -209,6 +210,9 @@ private fun SetupScreen(initial: List<TrackedRoute>, onDone: (List<TrackedRoute>
     var confirm by remember { mutableStateOf<TrackedRoute?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    var apiKey by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) { apiKey = loadApiKey(ctx) }
 
     fun work(block: suspend () -> Unit) {
         scope.launch {
@@ -225,6 +229,7 @@ private fun SetupScreen(initial: List<TrackedRoute>, onDone: (List<TrackedRoute>
     }
 
     fun search() = work {
+        saveApiKey(ctx, apiKey)
         stop = null
         routes = emptyList()
         stops = searchStops(query.trim())
@@ -237,6 +242,16 @@ private fun SetupScreen(initial: List<TrackedRoute>, onDone: (List<TrackedRoute>
             .padding(20.dp)
     ) {
         Text("정류장 · 노선 설정", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = apiKey,
+            onValueChange = { apiKey = it },
+            label = { Text("공공데이터포털 인증키 (Decoding)") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = { Text("data.go.kr 에서 서울시 정류소·노선·도착정보 3종을 활용신청하면 받는 키") },
+        )
         Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
@@ -254,6 +269,7 @@ private fun SetupScreen(initial: List<TrackedRoute>, onDone: (List<TrackedRoute>
             if (picked.isNotEmpty()) {
                 Button(onClick = {
                     scope.launch {
+                        saveApiKey(ctx, apiKey)
                         saveTargets(ctx, picked)
                         scheduleWidgetRefresh(ctx)
                         runCatching { BusWidget().updateAll(ctx) }

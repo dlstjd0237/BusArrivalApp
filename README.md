@@ -77,11 +77,13 @@ Play 스토어에는 올리지 않는다. 서울시 버스 오픈API가 상업�
 
 ### 설치와 설정
 
-1. [Releases](https://github.com/dlstjd0237/BusArrivalApp/releases)에서 APK 다운로드 → "출처를 알 수 없는 앱 설치" 허용 → 설치
-   (또는 아래 "직접 빌드"로 자기 인증키를 넣어 빌드)
-2. 첫 실행 → 정류장 이름 검색 → 정류장 선택 → 노선 선택
-3. 방면 확인 다이얼로그에서 방향 확인 → 추가 → 완료
-4. 홈 화면 길게 누르기 → 위젯 → "버스 도착" 배치 (2×2)
+1. [공공데이터포털](https://www.data.go.kr)에서 위 3개 서비스를 활용신청하고 **일반 인증키(Decoding)** 를 받는다 (자동승인, 반영까지 최대 1시간)
+2. [Releases](https://github.com/dlstjd0237/BusArrivalApp/releases)에서 APK 다운로드 → "출처를 알 수 없는 앱 설치" 허용 → 설치
+3. 첫 실행 → **인증키 입력** → 정류장 이름 검색 → 정류장 선택 → 노선 선택
+4. 방면 확인 다이얼로그에서 방향 확인 → 추가 → 완료
+5. 홈 화면 길게 누르기 → 위젯 → "버스 도착" 배치 (2×2)
+
+> 배포되는 APK에는 **인증키가 들어있지 않다.** 키는 기기에만 저장되며 설정 화면에서 언제든 바꿀 수 있다.
 
 ### 직접 빌드
 
@@ -94,7 +96,9 @@ cp local.properties.example local.properties
 ./gradlew installDebug        # 연결된 기기에 설치
 ```
 
-인증키는 `local.properties`(로컬) 또는 `DATA_GO_KR_KEY` 환경변수(CI)에서만 주입되며, 저장소에 포함되지 않는다. Decoding 키를 넣으면 앱이 URL 인코딩을 처리한다.
+매번 앱에 키를 넣기 귀찮으면 `local.properties` 의 `DATA_GO_KR_KEY` 를 채워 빌드한다. 그 값은 `BuildConfig` 기본값으로 쓰이고, 앱에서 입력한 키가 있으면 그쪽이 우선한다. Decoding 키를 넣으면 앱이 URL 인코딩을 처리하고, Encoding 키를 넣어도 이중 인코딩하지 않는다.
+
+**공개 저장소라면 `DATA_GO_KR_KEY` 를 GitHub Secret 에 등록하지 말 것.** 등록하면 배포 APK 안에 키가 박히고, 디컴파일로 추출되어 본인 계정의 일일 한도가 소모된다.
 
 ### 릴리스
 
@@ -113,7 +117,6 @@ git tag v1.0.0 && git push origin v1.0.0
 
 | Secret | 내용 |
 |---|---|
-| `DATA_GO_KR_KEY` | 공공데이터포털 인증키(Decoding) |
 | `KEYSTORE_BASE64` | `openssl base64 -in bus.jks \| tr -d '\n'` 결과 |
 | `KEYSTORE_PASSWORD` / `KEY_ALIAS` / `KEY_PASSWORD` | 키스토어 자격 정보 |
 
