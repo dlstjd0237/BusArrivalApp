@@ -98,7 +98,12 @@ cp local.properties.example local.properties
 
 ### 릴리스
 
-`v1.2.3` 형식의 태그를 푸시하면 GitHub Actions가 서명된 APK를 빌드해 Release에 첨부한다. `versionCode`는 워크플로 실행 번호, `versionName`은 태그명이 된다.
+둘 다 GitHub Actions가 자동으로 만든다. `versionCode`는 워크플로 실행 번호, `versionName`은 태그명이 된다.
+
+| 트리거 | 결과 |
+|---|---|
+| `main` 브랜치 푸시 | [`latest` 롤링 릴리스](https://github.com/dlstjd0237/BusArrivalApp/releases/tag/latest)의 APK를 교체 (릴리스가 쌓이지 않음) |
+| `v1.2.3` 태그 푸시 | 해당 버전의 정식 릴리스 생성 |
 
 ```bash
 git tag v1.0.0 && git push origin v1.0.0
