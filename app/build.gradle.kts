@@ -33,7 +33,7 @@ android {
 
     signingConfigs {
         create("release") {
-            val ks = providers.environmentVariable("KEYSTORE_FILE").orNull?.let { file(it) }
+            val ks = providers.environmentVariable("KEYSTORE_FILE").orNull?.takeIf { it.isNotBlank() }?.let { file(it) }
             if (ks != null && ks.exists()) {
                 storeFile = ks
                 storePassword = providers.environmentVariable("KEYSTORE_PASSWORD").orNull
