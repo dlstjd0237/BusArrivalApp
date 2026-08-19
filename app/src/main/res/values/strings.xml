@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">버스 도착</string>
+    <string name="widget_description">저장한 노선의 남은 도착 시간</string>
+</resources>

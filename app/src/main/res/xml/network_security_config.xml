@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 서울시 버스 API는 http만 제공한다. 이 도메인에만 평문 통신을 허용하고 나머지는 기본값(차단) 유지. -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">ws.bus.go.kr</domain>
+    </domain-config>
+</network-security-config>
